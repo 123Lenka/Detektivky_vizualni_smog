@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-# Seznam ID z výdejních míst
+# Seznam PPL ID výdejních míst
 ids = [
     4441996, 4442021, 4445468, 4445470, 4447573,
     4448494, 4449200, 4449211, 4450249, 4452846
@@ -19,32 +19,51 @@ for vid in ids:
         response = requests.get(url, timeout=10)
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Najdi blok s adresou (může se změnit, závisí na HTML)
+        # Najdi adresní blok
         address_div = soup.find("div", class_="detail__address")
-        city_psc = address_div.find_all("div")[1].text.strip()  # Např. "768 24 Hulín"
+        address_lines = address_div.find_all("div")
 
-        # Rozděl na PSČ a město
-        psc, city = city_psc.split(" ", 1)
+        if len(address_lines) >= 2:
+            street_line = address_lines[0].text.strip()        # např. "Sadová 1008"
+            city_line = address_lines[1].text.strip()          # např. "768 24 Hulín"
 
-        results.append({
-            "id": vid,
-            "psc": psc,
-            "city": city
-        })
+            # Zpracuj město a PSČ
+            psc, city = city_line.split(" ", 1)
 
-        time.sleep(1)  # Šetrné načítání
+            # Rozdělení čísla orientačního/popisného
+            parts = street_line.split()
+            if parts[-1].isdigit():
+                street = " ".join(parts[:-1])
+                house_number = parts[-1]
+            else:
+                street = street_line
+                house_number = ""
+
+            results.append({
+                "id": vid,
+                "street": street,
+                "house_number": house_number,
+                "psc": psc,
+                "city": city
+            })
+        else:
+            raise ValueError("Adresní blok je neúplný")
+
+        time.sleep(1)  # Ochrana proti přetížení
 
     except Exception as e:
         print(f"Chyba u ID {vid}: {e}")
         results.append({
             "id": vid,
+            "street": None,
+            "house_number": None,
             "psc": None,
             "city": None
         })
 
-# Výstup jako DataFrame
+# Výstup do DataFrame
 df = pd.DataFrame(results)
 print(df)
 
-# Volitelně uložit jako CSV
-df.to_csv("vystup_mesta_ppl.csv", index=False, encoding="utf-8-sig")
+# Volitelné uložení
+df.to_csv("ppl_adresy.csv", index=False, encoding="utf-8-sig")
