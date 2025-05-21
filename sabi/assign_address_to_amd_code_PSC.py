@@ -17,11 +17,11 @@ from bs4 import BeautifulSoup
 import re
 
 # --- Konfigurace ---
-INPUT_CSV_FILE = r"C:\Users\Sabina\Sabi dokumenty\01 Czechitas\01 PYTHON\Python\Detektivky_vizualni_smog\sabi\zasilkovna_enriched - zasilkovna_enriched (1).csv"
+INPUT_CSV_FILE = r"C:\Users\Sabina\Sabi dokumenty\01 Czechitas\01 PYTHON\Python\Detektivky_vizualni_smog\sabi\data\doctors_pomocny.csv"
 OUTPUT_CSV_FILE = INPUT_CSV_FILE.replace(".csv", "") + "_kod_obce.csv"
 
-ADDRESS_COLUMN = 'street'
-CITY_COLUMN = 'City'
+ADDRESS_COLUMN = 'Ulice'
+CITY_COLUMN = 'Obec'
 PSC_COLUMN = 'Psc'
 
 CITY_CODE_COLUMN = "city_code"
@@ -43,9 +43,33 @@ HEADERS = {
 # --- Nastavení pro testování ---
 # Pokud chcete zpracovat pouze prvních N řádků, nastavte MAX_ROWS na požadovanou hodnotu (např. 10).
 # Pokud chcete zpracovat celý soubor, nastavte MAX_ROWS na None.
-MAX_ROWS = 10  # Změňte na None pro zpracování celého souboru
+MAX_ROWS = None # Změňte na None pro zpracování celého souboru
 
+# def get_address_alternatives(address_detail, city, psc):
+#     psc = str(psc).zfill(5)
+#     full = f"{address_detail} {city} {psc}"
+#     no_num = "".join(char for char in address_detail if not char.isdigit() and char != '/')
+#     no_num = no_num.replace("nám.", "")
+#     no_num_full = f"{no_num} {city} {psc}"
+#     no_street = f"{city} {psc}"
+#     no_city = f"{address_detail} {psc}"
+
+#     return [
+#         ('full', full),
+#         ('no_num', no_num_full),
+#         ('no_street', no_street),
+#         ('no_city', no_city)
+#     ]
 def get_address_alternatives(address_detail, city, psc):
+    psc = str(psc).zfill(5)
+
+    if pd.isna(address_detail) or str(address_detail).strip() == "":
+        # Ulice chybí – vracíme jen varianty bez ní
+        return [
+            ('no_street', f"{city} {psc}")
+        ]
+
+    # Ulice existuje – vracíme plné varianty
     full = f"{address_detail} {city} {psc}"
     no_num = "".join(char for char in address_detail if not char.isdigit() and char != '/')
     no_num = no_num.replace("nám.", "")
@@ -59,7 +83,6 @@ def get_address_alternatives(address_detail, city, psc):
         ('no_street', no_street),
         ('no_city', no_city)
     ]
-
 def get_address_code(address_detail, city, psc):
     if pd.isna(address_detail) or pd.isna(city) or pd.isna(psc):
         print(f"Chybí adresa, město nebo PSČ: {address_detail}, {city}, {psc}")
@@ -127,9 +150,9 @@ def match_address_to_city_code():
     print(f"Spouštění skriptu. Načítání vstupního souboru: {INPUT_CSV_FILE}")
     try:
         # Načtení CSV s explicitním určením datového typu pro sloupec PSČ
-        with open(INPUT_CSV_FILE, mode='r', encoding='windows-1250', errors='ignore') as f:
-            df = pd.read_csv(f, dtype={PSC_COLUMN: str})
-        # df = pd.read_csv(INPUT_CSV_FILE, dtype={PSC_COLUMN: str}, encoding='windows-1250')
+        with open(INPUT_CSV_FILE, mode='r', encoding='utf-8-sig', errors='ignore') as f:
+            # df = pd.read_csv(f, dtype={PSC_COLUMN: str})
+            df = pd.read_csv(INPUT_CSV_FILE, dtype={PSC_COLUMN: str}, encoding='utf-8-sig')
         print(f"Úspěšně načteno {len(df)} řádků z {INPUT_CSV_FILE}")
     except FileNotFoundError:
         print(f"Chyba: Vstupní soubor '{INPUT_CSV_FILE}' nenalezen.")
