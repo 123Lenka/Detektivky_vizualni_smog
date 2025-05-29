@@ -4,13 +4,13 @@ import urllib.parse
 import time
 from bs4 import BeautifulSoup
 import re
-import json  # Import knihovny json pro práci s JSON daty
+import json  
 
 # --- Konfigurace ---
-INPUT_FILE = 'dpd_getAll_country203.json'  # Změň na název tvého JSON souboru
+INPUT_FILE = 'dpd_getAll_country203.json'  
 OUTPUT_FILE = INPUT_FILE.replace(".json", "") + "_kod_obce.csv"
 
-# Vstup - tvůj JSON soubor
+
 DATA_ITEMS_PATH = ['data', 'items']  # Cesta k listu s daty
 CITY_COL = 'city'
 STREET_COL = 'street'
