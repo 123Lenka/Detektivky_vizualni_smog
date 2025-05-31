@@ -1,0 +1,15 @@
+01. Zakladní rozdělení a čištění
+V souboru byly kromě PPL Boxů i AlzaBoxy a PPLShopy, proto došlo k jejich rozdělení.
+Zároveň zde došlo k základnímu čištění dat a rozdělení do různých sloupců. 
+
+02. Přidání adresy přes reverse geocoding od Apify
+V tomto kroku došlo k přidání adresy přes platformu Apify pomocí GPS souřadnic.
+
+03. Odstranění duplicit
+Získáním adres došlo k zijštění, že jsou všechny záznamy zduplikované a tudíž byly odstraněny.
+
+04. Čištění nově získaných adres
+Adresy získané pomocí GPS souřadnic byly mnohdy špatné, neúplné nebo s náhodnými znaky. Bylo tedy nutné tyto záznamy opravit.
+
+05. Přiřazení kódu RÚIAN
+Vyčištěný dataset s PPL Boxy byl pomocí python kódu rozšířen o unikátní RÚIAN kódy. Některé záznamy se však nepropojily a ty bylo nutné ještě manuálně doplnit.
