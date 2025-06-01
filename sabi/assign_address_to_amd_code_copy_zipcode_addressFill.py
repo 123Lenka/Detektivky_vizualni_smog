@@ -3,11 +3,7 @@
 # - doplněné párování o parametr PSC
 # - doplnění o testovací vzorek
 # - přidáno doplnění o ulici i č.p z RUAIAN, jen pro kontrolu (není logické vyhle
-#dávat č.p., nehce se mi to z kódu mazat.)
-# 
-# format souboru - row 23-
-# testovací vzorek - row 46
-# parametry vstupní tabulky (názvy sloupců) - 23-25
+#dávat č.p.
 
 
 import pandas as pd
